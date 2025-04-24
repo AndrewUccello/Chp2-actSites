@@ -1,0 +1,91 @@
+---
+title: "CHP2_dataExploration"
+format: html
+editor: visual
+---
+```{r}
+install.packages("ez")
+library(ez)
+install.packages("nlme")
+library(nlme)
+```
+
+
+```{r}
+trait_data_raw$year <- factor(trait_data_raw$year)
+trait_data_raw_long <- pivot_longer(
+  trait_data_raw,
+  cols = c(c, n, p, CN, CP, NP, bsi, sla),
+                 names_to = "trait", 
+                 values_to = "value"
+                 )
+trait_data_raw_long$site <- factor(trait_data_raw_long$site, 
+                                    levels = c("CON", "BUR", "HAY", "LAT", "RUN"))
+```
+
+```{r}
+raw_2022 <- trait_data_raw %>%
+  filter(year == "2022")
+raw_2023 <- trait_data_raw %>%
+  filter(year == "2023")
+raw_2022_car <- trait_data_raw %>%
+  filter(year == "2022") %>%
+  filter(species == "CAR")
+raw_2023_car <- trait_data_raw %>%
+  filter(year == "2023") %>%
+  filter(species == "CAR")
+raw_2022_pet <- trait_data_raw %>%
+  filter(year == "2022") %>%
+  filter(species == "PET")
+raw_2023_pet <- trait_data_raw %>%
+  filter(year == "2023") %>%
+  filter(species == "PET")
+  
+```
+
+```{r}
+LME_c_df <- trait_data_raw_long %>%
+  filter(trait == "c")
+LME_n_df <- trait_data_raw_long %>%
+  filter(trait == "n")
+
+LME_n_car_df <- trait_data_raw_long %>%
+  filter(trait == "n", species == "CAR")
+LME_p_car_df <- trait_data_raw_long %>%
+  filter(trait == "p", species == "CAR")
+```
+
+```{r}
+lme_model_c <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_c_df,
+  na.action = na.exclude
+)
+lme_model_n <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_n_df,
+  na.action = na.exclude
+)
+anova(lme_model_c)
+anova(lme_model_n)
+
+lme_model_n_car <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_n_car_df,
+  na.action = na.exclude
+)
+lme_model_p_car <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_p_car_df,
+  na.action = na.exclude
+)
+
+anova(lme_model_n_car)
+anova(lme_model_p_car)
+```
+
+
