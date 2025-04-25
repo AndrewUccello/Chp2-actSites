@@ -21,6 +21,26 @@ trait_data_raw_long <- pivot_longer(
                  )
 trait_data_raw_long$site <- factor(trait_data_raw_long$site, 
                                     levels = c("CON", "BUR", "HAY", "LAT", "RUN"))
+
+trait_data_raw_car <- trait_data_raw %>%
+  filter(species == "CAR")
+trait_data_raw_pet <- trait_data_raw %>%
+  filter(species == "PET")
+
+trait_data_car_long <- pivot_longer(
+  trait_data_car_trans,
+  cols = c(c, n, p, CN, CP, NP, bsi, sla, log_sla, log_c, log_n, log_p, log_cp, log_np, log_bsi, sqrt_c, c2),
+                 names_to = "trait", 
+                 values_to = "value"
+                 )
+trait_data_car_trans$site <- factor(trait_data_car_trans$site, 
+                                    levels = c("CON", "BUR", "HAY", "LAT", "RUN"))
+trait_data_pet_long <- pivot_longer(
+  trait_data_pet_trans,
+  cols = c(c, n, p, CN, CP, NP, bsi, sla, log_p, log_bsi),
+                 names_to = "trait", 
+                 values_to = "value"
+                 )
 ```
 
 ```{r}
@@ -43,34 +63,111 @@ raw_2023_pet <- trait_data_raw %>%
   
 ```
 
-```{r}
-LME_c_df <- trait_data_raw_long %>%
-  filter(trait == "c")
-LME_n_df <- trait_data_raw_long %>%
-  filter(trait == "n")
 
-LME_n_car_df <- trait_data_raw_long %>%
-  filter(trait == "n", species == "CAR")
-LME_p_car_df <- trait_data_raw_long %>%
-  filter(trait == "p", species == "CAR")
+
+```{r}
+# List of response variables car
+response_vars_car<- c("c", "n", "p", "log_p", "CN", "CP","NP", "bsi", "log_bsi", "sla", "sqrt_c","c2")
+
+# Loop through each response variable
+for (response in response_vars_car) {
+  
+  # Fit a linear model (replace 'predictors' with your actual variable names)
+  model <- lm(as.formula(paste(response, "~ site")), data = trait_data_car_trans)
+  
+  # Get the residuals
+  residuals <- model$residuals
+  
+  # 1. Histogram of residuals
+  print(
+    ggplot(data.frame(residuals), aes(x = residuals)) +
+    geom_histogram(bins = 30, fill = 'lightblue', color = 'black') +
+    labs(title = paste("Histogram of Residuals for", response), x = "Residuals", y = "Frequency") +
+    theme_minimal() 
+  )
+  # 2. Q-Q plot for normality
+  qqnorm(residuals)
+  qqline(residuals, col = "red")
+  title(paste("QQ Plot of Residuals for", response))
+  
+}
+```
+
+
+```{r}
+# List of response variables pet
+response_vars_pet<- c("c", "n", "p","log_p", "CN", "CP","NP", "bsi", "log_bsi", "sla")
+
+# Loop through each response variable
+for (response in response_vars_pet) {
+  
+  # Fit a linear model (replace 'predictors' with your actual variable names)
+  model <- lm(as.formula(paste(response, "~ site")), data = trait_data_pet_trans)
+  
+  # Get the residuals
+  residuals <- model$residuals
+  
+  # 1. Histogram of residuals
+  print(
+    ggplot(data.frame(residuals), aes(x = residuals)) +
+    geom_histogram(bins = 30, fill = 'lightblue', color = 'black') +
+    labs(title = paste("Histogram of Residuals for", response), x = "Residuals", y = "Frequency") +
+    theme_minimal() 
+  )
+  
+  # 2. Q-Q plot for normality
+  qqnorm(residuals)
+  qqline(residuals, col = "red")
+  title(paste("QQ Plot of Residuals for", response))
+  
+}
 ```
 
 ```{r}
-lme_model_c <- lme(
-  value ~ site * year,
-  random = ~1 | rep,
-  data = LME_c_df,
-  na.action = na.exclude
-)
-lme_model_n <- lme(
-  value ~ site * year,
-  random = ~1 | rep,
-  data = LME_n_df,
-  na.action = na.exclude
-)
-anova(lme_model_c)
-anova(lme_model_n)
+trait_data_car_trans <- trait_data_raw_car
+trait_data_car_trans$log_c <- log(trait_data_raw_car$c)
+trait_data_car_trans$log_n <- log(trait_data_raw_car$n)
+trait_data_car_trans$log_p <- log(trait_data_raw_car$p)
+trait_data_car_trans$log_cp <- log(trait_data_raw_car$CP)
+trait_data_car_trans$log_np <- log(trait_data_raw_car$NP)
+trait_data_car_trans$log_bsi <- log(trait_data_raw_car$bsi)
+trait_data_car_trans$log_sla <- log(trait_data_raw_car$sla)
+trait_data_car_trans$sqrt_c <- sqrt(trait_data_raw_car$c)
+trait_data_car_trans$c2 <- trait_data_raw_car$c^2
 
+trait_data_pet_trans <- trait_data_raw_pet
+trait_data_pet_trans$log_p <- log(trait_data_raw_pet$p)
+trait_data_pet_trans$log_bsi <- log(trait_data_raw_pet$bsi)
+
+```
+
+```{r}
+
+LME_c_car_df <- trait_data_car_long %>%
+  filter(trait == "c", species == "CAR")
+LME_n_car_df <- trait_data_car_long %>%
+  filter(trait == "n", species == "CAR")
+LME_p_car_df <- trait_data_car_long %>%
+  filter(trait == "log_p", species == "CAR")
+LME_cn_car_df <- trait_data_car_long %>%
+  filter(trait == "CN", species == "CAR")
+LME_cp_car_df <- trait_data_car_long %>%
+  filter(trait == "CP", species == "CAR")
+LME_np_car_df <- trait_data_car_long %>%
+  filter(trait == "NP", species == "CAR")
+LME_sla_car_df <- trait_data_car_long %>%
+  filter(trait == "sla", species == "CAR")
+LME_bsi_car_df <- trait_data_car_long %>%
+  filter(trait == "log_bsi", species == "CAR")
+```
+
+```{r}
+lme_model_c_car <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_c_car_df,
+  na.action = na.exclude
+)
 lme_model_n_car <- lme(
   value ~ site * year,
   random = ~1 | rep,
@@ -83,9 +180,67 @@ lme_model_p_car <- lme(
   data = LME_p_car_df,
   na.action = na.exclude
 )
-
+lme_model_cn_car <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_cn_car_df,
+  na.action = na.exclude
+)
+lme_model_cp_car <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_cp_car_df,
+  na.action = na.exclude
+)
+lme_model_np_car <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_np_car_df,
+  na.action = na.exclude
+)
+lme_model_sla_car <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_sla_car_df,
+  na.action = na.exclude
+)
+lme_model_bsi_car <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_bsi_car_df,
+  na.action = na.exclude
+)
+anova(lme_model_c_car)
 anova(lme_model_n_car)
 anova(lme_model_p_car)
+anova(lme_model_cn_car)
+anova(lme_model_cp_car)
+anova(lme_model_np_car)
+anova(lme_model_sla_car)
+anova(lme_model_bsi_car)
+
+
 ```
 
+
+```{r}
+yaxis_variables <- colnames(trait_data_car_trans) 
+
+
+for (y_col in yaxis_variables) {
+  # Make sure to only include numeric or relevant columns for y
+  if (is.numeric(trait_data_car_trans[[y_col]])) {
+    car_plots <- trait_data_car_trans %>%
+      ggplot(aes(x = site, y = .data[[y_col]])) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "YlGn") +
+      scale_color_brewer(palette = "YlGn") +
+      theme_minimal()
+    
+    # Print the plot
+    print(car_plots)
+  }
+}
+```
 
