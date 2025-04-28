@@ -159,6 +159,23 @@ LME_sla_car_df <- trait_data_car_long %>%
   filter(trait == "sla", species == "CAR")
 LME_bsi_car_df <- trait_data_car_long %>%
   filter(trait == "log_bsi", species == "CAR")
+
+LME_c_pet_df <- trait_data_pet_long %>%
+  filter(trait == "c", species == "PET")
+LME_n_pet_df <- trait_data_pet_long %>%
+  filter(trait == "n", species == "PET")
+LME_p_pet_df <- trait_data_pet_long %>%
+  filter(trait == "log_p", species == "PET")
+LME_cn_pet_df <- trait_data_pet_long %>%
+  filter(trait == "CN", species == "PET")
+LME_cp_pet_df <- trait_data_pet_long %>%
+  filter(trait == "CP", species == "PET")
+LME_np_pet_df <- trait_data_pet_long %>%
+  filter(trait == "NP", species == "PET")
+LME_sla_pet_df <- trait_data_pet_long %>%
+  filter(trait == "sla", species == "PET")
+LME_bsi_pet_df <- trait_data_pet_long %>%
+  filter(trait == "log_bsi", species == "PET")
 ```
 
 ```{r}
@@ -219,28 +236,398 @@ anova(lme_model_np_car)
 anova(lme_model_sla_car)
 anova(lme_model_bsi_car)
 
+summary(lme_model_c_car)
+summary(lme_model_n_car)
 
+emmeans(lme_model_c_car, pairwise ~ site, adjust = "tukey")
+emmeans(lme_model_n_car, pairwise ~ site, adjust = "tukey")
+emmeans(lme_model_p_car, pairwise ~ site, adjust = "tukey")
+emmeans(lme_model_cn_car, pairwise ~ site, adjust = "tukey")
+emmeans(lme_model_cp_car, pairwise ~ site, adjust = "tukey")
+emmeans(lme_model_np_car, pairwise ~ site, adjust = "tukey")
+emmeans(lme_model_sla_car, pairwise ~ site, adjust = "tukey")
+emmeans(lme_model_bsi_car, pairwise ~ site, adjust = "tukey")
+
+```
+```{r}
+lme_model_c_pet <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_c_pet_df,
+  na.action = na.exclude
+)
+lme_model_n_pet <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_n_pet_df,
+  na.action = na.exclude
+)
+lme_model_p_pet <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_p_pet_df,
+  na.action = na.exclude
+)
+lme_model_cn_pet <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_cn_pet_df,
+  na.action = na.exclude
+)
+lme_model_cp_pet <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_cp_pet_df,
+  na.action = na.exclude
+)
+lme_model_np_pet <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_np_pet_df,
+  na.action = na.exclude
+)
+lme_model_sla_pet <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_sla_pet_df,
+  na.action = na.exclude
+)
+lme_model_bsi_pet <- lme(
+  value ~ site * year,
+  random = ~1 | rep,
+  data = LME_bsi_pet_df,
+  na.action = na.exclude
+)
+anova(lme_model_c_pet)
+anova(lme_model_n_pet)
+anova(lme_model_p_pet)
+anova(lme_model_cn_pet)
+anova(lme_model_cp_pet)
+anova(lme_model_np_pet)
+anova(lme_model_sla_pet)
+anova(lme_model_bsi_pet)
+
+emmeans(lme_model_sla_pet, pairwise ~ site, adjust = "tukey")
 ```
 
 
 ```{r}
-yaxis_variables <- colnames(trait_data_car_trans) 
+yaxis_variables_car <- colnames(trait_data_car_trans) 
 
 
-for (y_col in yaxis_variables) {
+for (y_col_car in yaxis_variables_car) {
   # Make sure to only include numeric or relevant columns for y
-  if (is.numeric(trait_data_car_trans[[y_col]])) {
+  if (is.numeric(trait_data_car_trans[[y_col_car]])) {
     car_plots <- trait_data_car_trans %>%
-      ggplot(aes(x = site, y = .data[[y_col]])) + 
+      ggplot(aes(x = site, y = .data[[y_col_car]])) + 
       geom_boxplot(aes(fill = site), outlier.shape = NA) +
       geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
-      scale_fill_brewer(palette = "YlGn") +
-      scale_color_brewer(palette = "YlGn") +
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~year)
       theme_minimal()
     
     # Print the plot
     print(car_plots)
   }
 }
+
+yaxis_variables_pet <- colnames(trait_data_pet_trans) 
+
+
+for (y_col_pet in yaxis_variables_pet) {
+  # Make sure to only include numeric or relevant columns for y
+  if (is.numeric(trait_data_pet_trans[[y_col_pet]])) {
+    pet_plots <- trait_data_pet_trans %>%
+      ggplot(aes(x = site, y = .data[[y_col_pet]])) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~ year)
+      theme_minimal()
+    
+    # Print the plot
+    print(pet_plots)
+  }
+}
+```
+```{r}
+arrangeC_car <- trait_data_car_trans %>%
+      ggplot(aes(x = site, y = c)) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~ year) +
+      theme_minimal()+ theme(axis.title.x = element_blank())
+arrangeN_car <- trait_data_car_trans %>%
+      ggplot(aes(x = site, y = n)) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~ year) +
+      theme_minimal()+ theme(axis.title.x = element_blank())
+arrangeP_car <- trait_data_car_trans %>%
+      ggplot(aes(x = site, y = p)) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~ year) +
+      theme_minimal()+ theme(axis.title.x = element_blank())
+arrangeCN_car <- trait_data_car_trans %>%
+      ggplot(aes(x = site, y = CN)) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~ year) +
+      theme_minimal()+ theme(axis.title.x = element_blank())
+arrangeCP_car <- trait_data_car_trans %>%
+      ggplot(aes(x = site, y = CP)) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~ year) +
+      theme_minimal()+ theme(axis.title.x = element_blank())
+arrangeNP_car <- trait_data_car_trans %>%
+      ggplot(aes(x = site, y = NP)) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~ year) +
+      theme_minimal()+ theme(axis.title.x = element_blank())
+arrangeSLA_car <- trait_data_car_trans %>%
+      ggplot(aes(x = site, y = sla)) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~ year) +
+      theme_minimal()+ theme(axis.title.x = element_blank())
+arrangeBSI_car <- trait_data_car_trans %>%
+      ggplot(aes(x = site, y = bsi)) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~ year) +
+      theme_minimal() + theme(axis.title.x = element_blank())
+
+arrangeBSI_car
+cnpFigures_car <- ggarrange(arrangeC_car, arrangeN_car, arrangeP_car, arrangeCN_car, arrangeCP_car, arrangeNP_car, common.legend = TRUE)
+carFigures_other <- ggarrange(arrangeBSI_car, arrangeSLA_car, common.legend = TRUE)
+
+
+ggsave("cnpFigures_car.jpg", cnpFigures_car, height = 8, width = 16)
+ggsave("carFigures_other.jpg", carFigures_other, height = 8, width = 16)
+```
+
+```{r}
+arrangeC_pet <- trait_data_pet_trans %>%
+      ggplot(aes(x = site, y = c)) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~ year) +
+      theme_minimal()+ theme(axis.title.x = element_blank())
+arrangeN_pet <- trait_data_pet_trans %>%
+      ggplot(aes(x = site, y = n)) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~ year) +
+      theme_minimal()+ theme(axis.title.x = element_blank())
+arrangeP_pet <- trait_data_pet_trans %>%
+      ggplot(aes(x = site, y = p)) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~ year) +
+      theme_minimal()+ theme(axis.title.x = element_blank())
+arrangeCN_pet <- trait_data_pet_trans %>%
+      ggplot(aes(x = site, y = CN)) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~ year) +
+      theme_minimal()+ theme(axis.title.x = element_blank())
+arrangeCP_pet <- trait_data_pet_trans %>%
+      ggplot(aes(x = site, y = CP)) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~ year) +
+      theme_minimal()+ theme(axis.title.x = element_blank())
+arrangeNP_pet <- trait_data_pet_trans %>%
+      ggplot(aes(x = site, y = NP)) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~ year) +
+      theme_minimal()+ theme(axis.title.x = element_blank())
+arrangeSLA_pet <- trait_data_pet_trans %>%
+      ggplot(aes(x = site, y = sla)) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~ year) +
+      theme_minimal()+ theme(axis.title.x = element_blank())
+arrangeBSI_pet <- trait_data_pet_trans %>%
+      ggplot(aes(x = site, y = bsi)) + 
+      geom_boxplot(aes(fill = site), outlier.shape = NA) +
+      geom_jitter(width = 0.1, height = 0, alpha = 0.5)+
+      scale_fill_brewer(palette = "BrBG") +
+      facet_wrap(~ year) +
+      theme_minimal() + theme(axis.title.x = element_blank())
+
+
+cnpFigures_pet <- ggarrange(arrangeC_pet, arrangeN_pet, arrangeP_pet, arrangeCN_pet, arrangeCP_pet, arrangeNP_pet, common.legend = TRUE)
+petFigures_other <- ggarrange(arrangeBSI_pet, arrangeSLA_pet, common.legend = TRUE)
+
+
+ggsave("cnpFigures_pet.jpg", cnpFigures_pet, height = 8, width = 16)
+ggsave("petFigures_other.jpg", petFigures_other, height = 8, width = 16)
+```
+```{r}
+
+car_models_list <- list(
+  `%C` = lme_model_c_car,
+  `%N` = lme_model_n_car,
+  `%P` = lme_model_p_car,
+  `C:N` = lme_model_cn_car,
+  `C:P` = lme_model_cp_car,
+  `N:P` = lme_model_np_car,
+  `%BSI` = lme_model_bsi_car,
+  SLA = lme_model_sla_car
+)
+library(broom)
+library(flextable)
+library(officer)
+library(dplyr)
+
+# Function to extract and prettify ANOVA results from lme models
+extract_and_format_lme_anovas <- function(car_models_list) {
+  results_list <- list()
+  
+  for (model_name in names(car_models_list)) {
+    model <- car_models_list[[model_name]]
+    
+    anova_res <- anova(model)
+    anova_df <- as.data.frame(anova_res)
+    anova_df$Model <- model_name  # Track model source
+    
+    # Move rownames into a new column (for fixed effect name)
+    anova_df$Effect <- rownames(anova_df)
+    
+    results_list[[model_name]] <- anova_df
+  }
+  
+  # Combine all results
+  final_table <- do.call(rbind, results_list)
+  rownames(final_table) <- NULL
+  
+  # Optional: Reorder columns for cleaner look
+  final_table <- final_table %>%
+    select(Model, Effect, everything())
+  
+  return(final_table)
+}
+
+
+# Assuming you already have the final_table from the function above
+# Example:
+# models_list = list(height_model = lme1, weight_model = lme2)
+# final_table <- extract_and_format_lme_anovas(models_list)
+car_table <- extract_and_format_lme_anovas(car_models_list)
+
+if ("p-value" %in% names(car_table)) {
+  car_table <- car_table %>%
+    mutate(p_value_display = ifelse(`p-value` < 0.001, "<0.001", round(`p-value`, 3)))
+}
+
+if ("F-value" %in% names(car_table)) {
+  car_table <- car_table %>%
+    mutate(F_value_display = round(`F-value`, 3))
+}
+# Build flextable
+anova_flextable <- flextable(car_table) %>%
+  bold(i = ~ `p-value` < 0.05, j= "p_value_display", bold = TRUE) %>%  # Bold significant p-values
+  autofit() %>%
+  theme_box()  # Optional: nicer theme
+
+# Save to Word
+doc <- read_docx() %>%
+  body_add_flextable(anova_flextable)
+
+print(doc, target = "lme_anova_bolded.docx")
+
+```
+
+```{r}
+pet_models_list <- list(
+  `%C` = lme_model_c_pet,
+  `%N` = lme_model_n_pet,
+  `%P` = lme_model_p_pet,
+  `C:N` = lme_model_cn_pet,
+  `C:P` = lme_model_cp_pet,
+  `N:P` = lme_model_np_pet,
+  `%BSI` = lme_model_bsi_pet,
+  SLA = lme_model_sla_pet
+)
+library(broom)
+library(flextable)
+library(officer)
+library(dplyr)
+
+# Function to extract and prettify ANOVA results from lme models
+extract_and_format_lme_anovas <- function(pet_models_list) {
+  results_list_pet <- list()
+  
+  for (pet_model_name in names(pet_models_list)) {
+    pet_model <- pet_models_list[[pet_model_name]]
+    
+    anova_res_pet <- anova(pet_model)
+    anova_df_pet <- as.data.frame(anova_res_pet)
+    anova_df_pet$Model <- pet_model_name  # Track model source
+    
+    # Move rownames into a new column (for fixed effect name)
+    anova_df_pet$Effect <- rownames(anova_df_pet)
+    
+    results_list_pet[[pet_model_name]] <- anova_df_pet
+  }
+  
+  # Combine all results
+  final_table_pet <- do.call(rbind, results_list_pet)
+  rownames(final_table_pet) <- NULL
+  
+  # Optional: Reorder columns for cleaner look
+  final_table_pet <- final_table_pet %>%
+    select(Model, Effect, everything())
+  
+  return(final_table_pet)
+}
+
+
+# Assuming you already have the final_table from the function above
+# Example:
+# models_list = list(height_model = lme1, weight_model = lme2)
+# final_table <- extract_and_format_lme_anovas(models_list)
+pet_table <- extract_and_format_lme_anovas(pet_models_list)
+
+if ("p-value" %in% names(pet_table)) {
+  pet_table <- pet_table %>%
+    mutate(p_value_display = ifelse(`p-value` < 0.001, "<0.001", round(`p-value`, 3)))
+}
+
+if ("F-value" %in% names(pet_table)) {
+  pet_table <- pet_table %>%
+    mutate(F_value_display = round(`F-value`, 3))
+}
+# Build flextable
+anova_flextable_pet <- flextable(pet_table) %>%
+  bold(i = ~ `p-value` < 0.05, j= "p_value_display", bold = TRUE) %>%  # Bold significant p-values
+  autofit() %>%
+  theme_box()  # Optional: nicer theme
+
+# Save to Word
+doc <- read_docx() %>%
+  body_add_flextable(anova_flextable_pet)
+
+print(doc, target = "lme_anova_bolded_pet.docx")
 ```
 
