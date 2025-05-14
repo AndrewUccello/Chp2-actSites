@@ -41,6 +41,9 @@ trait_data_pet_long <- pivot_longer(
                  names_to = "trait", 
                  values_to = "value"
                  )
+                 
+trait_data_pet_trans$site <- factor(trait_data_pet_trans$site, 
+                                    levels = c("CON", "BUR", "HAY", "LAT", "RUN"))
 ```
 
 ```{r}
@@ -239,14 +242,29 @@ anova(lme_model_bsi_car)
 summary(lme_model_c_car)
 summary(lme_model_n_car)
 
-emmeans(lme_model_c_car, pairwise ~ site, adjust = "tukey")
-emmeans(lme_model_n_car, pairwise ~ site, adjust = "tukey")
-emmeans(lme_model_p_car, pairwise ~ site, adjust = "tukey")
-emmeans(lme_model_cn_car, pairwise ~ site, adjust = "tukey")
-emmeans(lme_model_cp_car, pairwise ~ site, adjust = "tukey")
-emmeans(lme_model_np_car, pairwise ~ site, adjust = "tukey")
-emmeans(lme_model_sla_car, pairwise ~ site, adjust = "tukey")
-emmeans(lme_model_bsi_car, pairwise ~ site, adjust = "tukey")
+emmCar_C <- emmeans(lme_model_c_car, ~ site*year)
+pairs(emmCar_C, by = "year", adjust = "tukey")
+
+emmCar_N <- emmeans(lme_model_n_car, ~site*year)
+pairs(emmCar_N, by = "year", adjust = "tukey")
+
+emmCar_P <- emmeans(lme_model_p_car, ~site*year)
+pairs(emmCar_P, by = "year", adjust = "tukey")
+
+emmCar_CN <- emmeans(lme_model_cn_car, ~site*year)
+pairs(emmCar_CN, by = "year", adjust = "tukey")
+
+emmCar_CP <- emmeans(lme_model_cp_car, ~site*year)
+pairs(emmCar_CP, by = "year", adjust = "tukey")
+
+emmCar_NP <- emmeans(lme_model_np_car, ~site*year)
+pairs(emmCar_NP, by = "year", adjust = "tukey")
+
+emmCar_SLA <- emmeans(lme_model_sla_car, ~site*year)
+pairs(emmCar_SLA, by = "year", adjust = "tukey")
+
+emmCar_BSI <- emmeans(lme_model_bsi_car, ~site*year)
+pairs(emmCar_BSI, by = "year", adjust = "tukey")
 
 ```
 ```{r}
@@ -307,7 +325,29 @@ anova(lme_model_np_pet)
 anova(lme_model_sla_pet)
 anova(lme_model_bsi_pet)
 
-emmeans(lme_model_sla_pet, pairwise ~ site, adjust = "tukey")
+emmPet_C <- emmeans(lme_model_c_pet, ~ site*year)
+pairs(emmPet_C, by = "year", adjust = "tukey")
+
+emmPet_N <- emmeans(lme_model_n_pet, ~site*year)
+pairs(emmPet_N, by = "year", adjust = "tukey")
+
+emmPet_P <- emmeans(lme_model_p_pet, ~site*year)
+pairs(emmPet_P, by = "year", adjust = "tukey")
+
+emmPet_CN <- emmeans(lme_model_cn_pet, ~site*year)
+pairs(emmPet_CN, by = "year", adjust = "tukey")
+
+emmPet_CP <- emmeans(lme_model_cp_pet, ~site*year)
+pairs(emmPet_CP, by = "year", adjust = "tukey")
+
+emmPet_NP <- emmeans(lme_model_np_pet, ~site*year)
+pairs(emmPet_NP, by = "year", adjust = "tukey")
+
+emmPet_SLA <- emmeans(lme_model_sla_pet, ~site*year)
+pairs(emmPet_SLA, by = "year", adjust = "tukey")
+
+emmPet_BSI <- emmeans(lme_model_bsi_pet, ~site*year)
+pairs(emmPet_BSI, by = "year", adjust = "tukey")
 ```
 
 
